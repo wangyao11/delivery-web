@@ -12,5 +12,9 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: false
+  sidebarLogo: false,
+
+  imageUrl: 'http://127.0.0.1:8888/images/',
+
+  imageUpload: 'http://127.0.0.1:8888/web/image/uploadImage'
 }

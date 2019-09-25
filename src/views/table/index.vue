@@ -34,7 +34,7 @@
           <el-tag :type="scope.row.states | statusFilter">{{ scope.row.states==0 ? "启用":"禁用" }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="300">
+      <el-table-column align="center" prop="created_at" label="时间" width="300">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.createTime }}</span>

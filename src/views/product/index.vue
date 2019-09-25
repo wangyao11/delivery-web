@@ -4,7 +4,7 @@
       <el-form :inline="true" :model="filters">
         <el-form-item>
           <template>
-            <el-select v-model="classId" clearable="true" placeholder="请选择商品分类">
+            <el-select v-model="classId" clearable placeholder="请选择商品分类">
               <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </template>
@@ -29,6 +29,11 @@
       <el-table-column align="center" label="编号" width="95">
         <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
+      <el-table-column label="商品图片" align="center">
+        <template slot-scope="scope">
+          <img :src="settings.imageUrl + scope.row.imageUrl" onerror="this.src='/favicon.ico'" style="width: 50px; height: 50px" />
+        </template>
+      </el-table-column>
       <el-table-column label="商品名称" width="300" align="center">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
@@ -43,6 +48,9 @@
           <span v-show="scope.row.type==6">件</span>
         </template>
       </el-table-column>
+      <el-table-column label="商品价格" width="300" align="center">
+        <template slot-scope="scope">{{ scope.row.price }}</template>
+      </el-table-column>
       <el-table-column label="商品描述">
         <template slot-scope="scope">{{ scope.row.remark }}</template>
       </el-table-column>
@@ -50,6 +58,11 @@
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button @click="handleUpdate(scope.row.id)" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -60,18 +73,32 @@
       :close-on-click-modal="false"
     >
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+        <el-form-item label="商品图片">
+          <el-upload
+            class="avatar-uploader"
+            :action="settings.imageUpload"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="addForm.imageUrl" :src="settings.imageUrl + addForm.imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="addForm.name" auto-complete="off" placeholder="请输入分类名称"></el-input>
         </el-form-item>
+        <el-form-item label="商品价格" prop="price">
+          <el-input v-model="addForm.price" auto-complete="off" placeholder="请输入商品价格"></el-input>
+        </el-form-item>
         <el-form-item label="商品类型" prop="type">
           <el-select v-model="addForm.type" placeholder="请选择类型">
-            <el-option label="斤" value="0"></el-option>
-            <el-option label="袋" value="1"></el-option>
-            <el-option label="瓶" value="2"></el-option>
-            <el-option label="桶" value="3"></el-option>
-            <el-option label="包" value="4"></el-option>
-            <el-option label="个" value="5"></el-option>
-            <el-option label="件" value="6"></el-option>
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.id"
+              :label="item.value"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="商品分类" prop="classId">
@@ -88,11 +115,98 @@
         <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="修改商品"
+      :visible.sync="updateFormVisible"
+      width="30%"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="updateForm" label-width="80px" :rules="addFormRules" ref="updateForm">
+        <el-input v-model="updateForm.id" style="display:none"></el-input>
+        <el-form-item label="商品名称" prop="name">
+          <el-input v-model="updateForm.name" auto-complete="off" placeholder="请输入分类名称"></el-input>
+        </el-form-item>
+        <el-form-item label="商品图片">
+          <el-upload
+            class="avatar-uploader"
+            :action="settings.imageUpload"
+            :show-file-list="false"
+            :on-success="handleUpdateSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img
+              v-if="updateForm.imageUrl"
+              :src="settings.imageUrl + updateForm.imageUrl"
+              class="avatar"
+            />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="商品价格" prop="price">
+          <el-input v-model="updateForm.price" auto-complete="off" placeholder="请输入商品价格"></el-input>
+        </el-form-item>
+        <el-form-item label="商品分类" prop="classId">
+          <el-select v-model="updateForm.classId" placeholder="请选择分类">
+            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品类型" prop="type">
+          <el-select v-model="updateForm.type" placeholder="请选择类型">
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.id"
+              :label="item.value"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品描述">
+          <el-input v-model="updateForm.remark" auto-complete="off" placeholder="请输入分类描述"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="updateFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="updateSubmit" :loading="updateLoading">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+</style>
+
 <script>
-import { getProductList, getClassList, addProduct } from "@/api/product";
+import {
+  getProductList,
+  getClassList,
+  addProduct,
+  updateProduct
+} from "@/api/product";
+
+import SETTINGS from "@/settings";
 
 export default {
   filters: {
@@ -110,17 +224,42 @@ export default {
       filters: {
         name: ""
       },
+      settings: SETTINGS,
+      imageUrl: "",
       list: null,
       listLoading: true,
+      addLoading: false,
+      updateLoading: false,
       options: [],
+      typeOptions: [
+        { id: "0", value: "斤" },
+        { id: "1", value: "袋" },
+        { id: "2", value: "瓶" },
+        { id: "3", value: "桶" },
+        { id: "4", value: "包" },
+        { id: "5", value: "个" },
+        { id: "6", value: "件" }
+      ],
       classId: "",
       addFormVisible: false, //新增界面是否显示
+      updateFormVisible: false, //新增界面是否显示
       //新增界面数据
       addForm: {
         name: "",
+        price: "",
         remark: "",
         classId: "",
-        type: ""
+        type: "",
+        imageUrl: ""
+      },
+      updateForm: {
+        id: "",
+        name: "",
+        price: "",
+        remark: "",
+        classId: "",
+        type: "",
+        imageUrl: ""
       },
       addFormRules: {
         name: [
@@ -132,6 +271,14 @@ export default {
         ],
         classId: [
           { required: true, message: "请选择商品分类", trigger: "change" }
+        ],
+        price: [
+          { required: true, message: "价格不能为空", trigger: "change" },
+          {
+            pattern: /(^[1-9]\d*(\.\d{1,2})?$)|(^0(\.\d{1,2})?$)/,
+            message: "请输入正确的价格",
+            trigger: "change"
+          }
         ]
       }
     };
@@ -166,13 +313,30 @@ export default {
     //显示新增界面
     handleAdd: function() {
       this.addFormVisible = true;
-      this.$refs["addForm"].resetFields();
-      this.addForm = {
-        name: "",
-        remark: "",
-        classId: "",
-        type: ""
-      };
+      if (this.$refs["addForm"]) {
+        this.$refs["addForm"].resetFields();
+      }
+    },
+    //显示编辑界面
+    handleUpdate: function(id) {
+      console.log("id:" + id);
+      this.updateForm.id = id;
+      this.updateFormVisible = true;
+      if (this.$refs["updateForm"]) {
+        this.$refs["updateForm"].resetFields();
+      }
+      for (var i in this.list) {
+        var product = this.list[i];
+        if (product.id === id) {
+          this.updateForm.name = product.name;
+          this.updateForm.price = product.price;
+          this.updateForm.remark = product.remark;
+          this.updateForm.type = product.type;
+          this.updateForm.classId = product.classId;
+          this.updateForm.imageUrl = product.imageUrl;
+        }
+      }
+      console.log(this.updateForm);
     },
     //新增
     addSubmit: function() {
@@ -194,11 +358,56 @@ export default {
               error => {
                 this.addLoading = false;
               }
-            )
-          })
+            );
+          });
         }
-      })
+      });
+    },
+    //修改
+    updateSubmit: function() {
+      this.$refs.updateForm.validate(valid => {
+        if (valid) {
+          this.updateLoading = true;
+          let params = Object.assign({}, this.updateForm);
+          updateProduct(params).then(
+            res => {
+              this.updateLoading = false;
+              this.$message({
+                message: "修改 成功",
+                type: "success"
+              });
+              this.updateFormVisible = false;
+              this.fetchData();
+            },
+            error => {
+              this.updateLoading = false;
+            }
+          );
+        }
+      });
+    },
+    handleAvatarSuccess(res, file) {
+      this.$set(this.addForm, "imageUrl", res.image);
+    },
+    handleUpdateSuccess(res, file) {
+      this.$set(this.updateForm, "imageUrl", res.image);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG =
+        file.type === "image/jpeg" ||
+        file.type === "image/jpg" ||
+        file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 4;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 4MB!");
+      }
+      return isJPG && isLt2M;
     }
   }
-}
+};
 </script>
+

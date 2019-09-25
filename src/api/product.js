@@ -9,8 +9,16 @@ export function getProductList(params) {
 }
 
 export function addProduct(params) {
+  return request({
+    url: 'web/product/add',
+    method: 'post',
+    data: params
+  })
+}
+
+export function updateProduct(params) {
     return request({
-        url: 'web/product/add',
+        url: 'web/product/updateById',
         method: 'post',
         data: params
     })
