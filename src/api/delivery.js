@@ -15,3 +15,11 @@ export function getUserList(params) {
     data:params
   })
 }
+
+export function addProductDelivery(params) {
+  return request({
+    url: '/web/deliveryUserProduct/add',
+    method: 'post',
+    data:params
+  })
+}
