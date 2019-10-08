@@ -38,15 +38,7 @@
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
       <el-table-column label="商品类型" align="center" width="300">
-        <template slot-scope="scope">
-          <span v-show="scope.row.type==0">斤</span>
-          <span v-show="scope.row.type==1">袋</span>
-          <span v-show="scope.row.type==2">瓶</span>
-          <span v-show="scope.row.type==3">桶</span>
-          <span v-show="scope.row.type==4">包</span>
-          <span v-show="scope.row.type==5">个</span>
-          <span v-show="scope.row.type==6">件</span>
-        </template>
+        <template slot-scope="scope">{{ scope.row.type }}</template>
       </el-table-column>
       <el-table-column label="商品价格" width="300" align="center">
         <template slot-scope="scope">{{ scope.row.price }}</template>
@@ -95,9 +87,9 @@
           <el-select v-model="addForm.type" placeholder="请选择类型">
             <el-option
               v-for="item in typeOptions"
-              :key="item.id"
+              :key="item.value"
               :label="item.value"
-              :value="item.id"
+              :value="item.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -154,9 +146,9 @@
           <el-select v-model="updateForm.type" placeholder="请选择类型">
             <el-option
               v-for="item in typeOptions"
-              :key="item.id"
+              :key="item.value"
               :label="item.value"
-              :value="item.id"
+              :value="item.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -232,13 +224,13 @@ export default {
       updateLoading: false,
       options: [],
       typeOptions: [
-        { id: "0", value: "斤" },
-        { id: "1", value: "袋" },
-        { id: "2", value: "瓶" },
-        { id: "3", value: "桶" },
-        { id: "4", value: "包" },
-        { id: "5", value: "个" },
-        { id: "6", value: "件" }
+        {value: "斤" },
+        {value: "袋" },
+        {value: "瓶" },
+        {value: "桶" },
+        {value: "包" },
+        {value: "个" },
+        {value: "件" }
       ],
       classId: "",
       addFormVisible: false, //新增界面是否显示

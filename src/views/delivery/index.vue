@@ -43,15 +43,7 @@
         <template slot-scope="scope">{{ scope.row.productName }}</template>
       </el-table-column>
       <el-table-column label="单位" width="300" align="center">
-        <template slot-scope="scope">
-          <span v-show="scope.row.productType==0">斤</span>
-          <span v-show="scope.row.productType==1">袋</span>
-          <span v-show="scope.row.productType==2">瓶</span>
-          <span v-show="scope.row.productType==3">桶</span>
-          <span v-show="scope.row.productType==4">包</span>
-          <span v-show="scope.row.productType==5">个</span>
-          <span v-show="scope.row.productType==6">件</span>
-        </template>
+        <template slot-scope="scope">{{ scope.row.productType }}</template>
       </el-table-column>
       <el-table-column label="数量" align="center" width="300">
         <template slot-scope="scope">
@@ -102,15 +94,7 @@
             <template slot-scope="scope">{{ scope.row.productName }}</template>
           </el-table-column>
           <el-table-column label="单位" align="center">
-            <template slot-scope="scope">
-              <span v-show="scope.row.productType==0">斤</span>
-              <span v-show="scope.row.productType==1">袋</span>
-              <span v-show="scope.row.productType==2">瓶</span>
-              <span v-show="scope.row.productType==3">桶</span>
-              <span v-show="scope.row.productType==4">包</span>
-              <span v-show="scope.row.productType==5">个</span>
-              <span v-show="scope.row.productType==6">件</span>
-            </template>
+            <template slot-scope="scope">{{ scope.row.productType }}</template>
           </el-table-column>
           <el-table-column label="数量" prop="totalCount" align="center">
             <template slot-scope="scope">
@@ -392,7 +376,7 @@ export default {
               message: "添加成功",
               type: "success"
             });
-            this.addDelivery = false;
+            this.addDeliveryVisible = false;
             this.fetchData();
           },
           error => {
