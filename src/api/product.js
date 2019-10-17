@@ -24,6 +24,14 @@ export function updateProduct(params) {
     })
 }
 
+export function updateStatesById(params) {
+    return request({
+        url: 'web/product/updateStatesById',
+        method: 'post',
+        data: params
+    })
+}
+
 export function getClassList() {
     return request({
         url: 'web/productClass/list',

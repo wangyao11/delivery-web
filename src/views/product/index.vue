@@ -34,27 +34,35 @@
           <img :src="settings.imageUrl + scope.row.imageUrl" onerror="this.src='/favicon.ico'" style="width: 50px; height: 50px" />
         </template>
       </el-table-column>
-      <el-table-column label="商品名称" width="300" align="center">
+      <el-table-column label="商品名称" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
       <el-table-column label="商品类型" align="center" width="300">
         <template slot-scope="scope">{{ scope.row.type }}</template>
       </el-table-column>
-      <el-table-column label="商品价格" width="300" align="center">
+      <el-table-column label="商品价格" width="100" align="center">
         <template slot-scope="scope">{{ scope.row.price }}</template>
+      </el-table-column>
+      <el-table-column label="商品状态" width="100" align="center">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.states==0" type="success">已上架</el-tag>
+          <el-tag v-if="scope.row.states==1" type="warning">已下架</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="商品描述">
         <template slot-scope="scope">{{ scope.row.remark }}</template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="创建时间" width="300">
+      <el-table-column align="center" prop="created_at" label="创建时间" width="200">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="100">
+      <el-table-column label="操作"  align="center" width="150">
         <template slot-scope="scope">
           <el-button @click="handleUpdate(scope.row.id)" type="text" size="small">编辑</el-button>
+          <el-button v-if="scope.row.states==0" @click="updateStates(scope.row.id, 1)" type="text" size="small">下架</el-button>
+          <el-button v-if="scope.row.states==1" @click="updateStates(scope.row.id, 0)" type="text" size="small">上架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -195,7 +203,8 @@ import {
   getProductList,
   getClassList,
   addProduct,
-  updateProduct
+  updateProduct,
+  updateStatesById
 } from "@/api/product";
 
 import SETTINGS from "@/settings";
@@ -392,12 +401,34 @@ export default {
       const isLt2M = file.size / 1024 / 1024 < 4;
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error("上传图片只能是 JPG,jpg,png 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 4MB!");
+        this.$message.error("上传图片大小不能超过 4MB!");
       }
       return isJPG && isLt2M;
+    },
+    updateStates(id, states) {
+      let params = {
+        id:id,
+        states:states
+      }
+      updateStatesById(params).then(
+        res => {
+          this.updateLoading = false;
+          this.$message({
+            message: "操作成功",
+            type: "success"
+          });
+          this.fetchData();
+        },
+        error => {
+          this.$message({
+            message: "操作失败",
+            type: "error"
+          });
+        }
+      );
     }
   }
 };

@@ -61,6 +61,15 @@
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="100">
+        <template slot-scope="scope">
+          <el-button @click="deleteById(scope.row.id)" type="text" size="small">删除</el-button>
+          <el-button @click="showUpdateProduct(scope.row)" type="text" size="small">编辑</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-dialog
       title="打印预览"
@@ -129,7 +138,7 @@
       </div>
     </el-dialog>
     <el-dialog
-      title="手动补充商品"
+      title="手动编辑商品"
       :visible.sync="addDeliveryVisible"
       width="30%"
       :close-on-click-modal="false"
@@ -182,7 +191,7 @@
 </style>
 
 <script>
-import { getList, getUserList, addProductDelivery } from "@/api/delivery";
+import { getList, getUserList, addProductDelivery,deleteById as apiDeleteById } from "@/api/delivery";
 import { getProductList } from "@/api/product";
 let moment = require("moment");
 
@@ -361,6 +370,10 @@ export default {
         });
         return;
       }
+      this.addDeliveryForm = {
+        count: 0,
+        productId: ""
+      }
       this.addDeliveryVisible = true;
     },
     addSubmit() {
@@ -384,6 +397,78 @@ export default {
           }
         );
       });
+    },
+    deleteById(deliveryId) {
+      if (this.startTime === "") {
+        this.$message({
+          message: "日期不能为空",
+          type: "error"
+        });
+        return;
+      }
+      if (this.startTime[0] !== this.startTime[1]) {
+        this.$message({
+          message: "必须选择同一天",
+          type: "error"
+        });
+        return;
+      }
+
+      if (this.userId === "") {
+        this.$message({
+          message: "请选择学校",
+          type: "error"
+        });
+        return;
+      }
+      this.$confirm("确认删除配送单中的商品吗？", "提示", {}).then(() => {
+        this.addLoading = true;
+        apiDeleteById(deliveryId).then(
+          res => {
+            this.addLoading = false;
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            });
+            this.fetchData();
+          },
+          error => {
+            this.$message({
+              message: "删除失败！",
+              type: "error"
+            });
+          }
+        );
+      });
+    },
+    showUpdateProduct(delivery){
+      if (this.startTime === "") {
+        this.$message({
+          message: "日期不能为空",
+          type: "error"
+        });
+        return;
+      }
+      if (this.startTime[0] !== this.startTime[1]) {
+        this.$message({
+          message: "必须选择同一天",
+          type: "error"
+        });
+        return;
+      }
+
+      if (this.userId === "") {
+        this.$message({
+          message: "学校不能为空",
+          type: "error"
+        });
+        return;
+      }
+      this.addDeliveryForm = {
+        count: delivery.totalCount,
+        productId: delivery.productId
+      }
+      this.addDeliveryVisible = true;
     }
   }
 };

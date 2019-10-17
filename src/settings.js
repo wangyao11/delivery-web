@@ -14,7 +14,7 @@ module.exports = {
    */
   sidebarLogo: false,
 
-  imageUrl: 'http://127.0.0.1:8888/images/',
+  imageUrl: process.env.VUE_APP_BASE_API + '/images/',
 
-  imageUpload: 'http://127.0.0.1:8888/web/image/uploadImage'
+  imageUpload: process.env.VUE_APP_BASE_API + '/web/image/uploadImage'
 }

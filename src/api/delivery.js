@@ -23,3 +23,10 @@ export function addProductDelivery(params) {
     data:params
   })
 }
+
+export function deleteById(id) {
+  return request({
+    url: '/web/deliveryUserProduct/deleteById?id=' + id,
+    method: 'post'
+  })
+}
