@@ -22,11 +22,18 @@
           </el-select>
         </el-form-item>
         <el-form-item>
+          <el-select v-model="classType" clearable placeholder="请选择类别" @change="selectUser">
+            <el-option v-for="item in classOptions" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @change="selectUser">刷新</el-button>
+        </el-form-item>
+        <el-form-item>
           <!-- <el-button type="primary" v-print="'#printMe'">打印</el-button> -->
           <el-button type="primary" @click.native="addFormVisible = true">打印</el-button>
         </el-form-item>
         <el-form-item>
-          <!-- <el-button type="primary" v-print="'#printMe'">打印</el-button> -->
           <el-button type="primary" @click="showAddProduct">手动补充商品</el-button>
         </el-form-item>
       </el-form>
@@ -127,7 +134,7 @@
           </el-table-column>
           <el-table-column label="总额" prop="totalPrice" align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.totalPrice = scope.row.totalCount*scope.row.productPrice }}</span>
+              <span>{{ scope.row.totalPrice = accMul(scope.row.totalCount, scope.row.productPrice)}}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -192,7 +199,7 @@
 
 <script>
 import { getList, getUserList, addProductDelivery,deleteById as apiDeleteById } from "@/api/delivery";
-import { getProductList } from "@/api/product";
+import { getProductList, getClassList } from "@/api/product";
 let moment = require("moment");
 
 export default {
@@ -217,6 +224,14 @@ export default {
       addFormVisible: false, //打印配送单
       addDeliveryVisible: false, //新增界面是否显示
       options: [],
+      classOptions:[{
+        'id':'0',
+        'name':'干货'
+      },{
+        'id':'1',
+        'name':'生鲜'
+      }],
+      classType:"",
       school: "所有学校",
       userId: "",
       products: [],
@@ -280,6 +295,9 @@ export default {
       if (this.userId) {
         params.userId = this.userId;
       }
+      if (this.classType) {
+        params.classType = this.classType;
+      }
       this.listLoading = true;
       getList(params)
         .then(response => {
@@ -317,9 +335,9 @@ export default {
           sums[index] = values.reduce((prev, curr) => {
             const value = Number(curr);
             if (!isNaN(value)) {
-              return prev + curr;
+              return Number((prev + curr).toFixed(2));
             } else {
-              return prev;
+              return Number(prev.toFixed(2))
             }
           }, 0);
           if (index == 2) {
@@ -469,6 +487,13 @@ export default {
         productId: delivery.productId
       }
       this.addDeliveryVisible = true;
+    },
+    accMul(arg1,arg2)
+    {
+      var m=0,s1=arg1.toString(),s2=arg2.toString();
+      try{m+=s1.split(".")[1].length}catch(e){}
+      try{m+=s2.split(".")[1].length}catch(e){}
+      return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
     }
   }
 };

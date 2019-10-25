@@ -10,6 +10,11 @@
           </template>
         </el-form-item>
         <el-form-item>
+          <template>
+            <el-input v-model="productName" placeholder="请输入产品名称"></el-input>
+          </template>
+        </el-form-item>
+        <el-form-item>
           <el-button type="primary" v-on:click="fetchData">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
@@ -37,7 +42,7 @@
       <el-table-column label="商品名称" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
-      <el-table-column label="商品类型" align="center" width="300">
+      <el-table-column label="商品单位" align="center" width="300">
         <template slot-scope="scope">{{ scope.row.type }}</template>
       </el-table-column>
       <el-table-column label="商品价格" width="100" align="center">
@@ -91,7 +96,20 @@
         <el-form-item label="商品价格" prop="price">
           <el-input v-model="addForm.price" auto-complete="off" placeholder="请输入商品价格"></el-input>
         </el-form-item>
-        <el-form-item label="商品类型" prop="type">
+        <el-form-item label="商品排序">
+          <el-input v-model="addForm.sort" auto-complete="off" placeholder="请输入排序值0-100"></el-input>
+        </el-form-item>
+        <el-form-item label="商品类别">
+          <el-select v-model="addForm.classType" placeholder="请选择类别">
+            <el-option v-for="item in classOptions" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品分类" prop="classId">
+          <el-select v-model="addForm.classId" placeholder="请选择分类">
+            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品单位" prop="type">
           <el-select v-model="addForm.type" placeholder="请选择类型">
             <el-option
               v-for="item in typeOptions"
@@ -99,11 +117,6 @@
               :label="item.value"
               :value="item.value"
             ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="商品分类" prop="classId">
-          <el-select v-model="addForm.classId" placeholder="请选择分类">
-            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="商品描述">
@@ -145,12 +158,25 @@
         <el-form-item label="商品价格" prop="price">
           <el-input v-model="updateForm.price" auto-complete="off" placeholder="请输入商品价格"></el-input>
         </el-form-item>
+        <el-form-item label="商品排序">
+          <el-input v-model="updateForm.sort" auto-complete="off" placeholder="请输入商品价格"></el-input>
+        </el-form-item>
+        <el-form-item label="商品类别">
+          <el-select v-model="updateForm.classType" placeholder="请选择类别">
+            <el-option 
+              v-for="item in classOptions" 
+              :key="item.id" 
+              :label="item.name" 
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="商品分类" prop="classId">
           <el-select v-model="updateForm.classId" placeholder="请选择分类">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="商品类型" prop="type">
+        <el-form-item label="商品单位" prop="type">
           <el-select v-model="updateForm.type" placeholder="请选择类型">
             <el-option
               v-for="item in typeOptions"
@@ -232,16 +258,26 @@ export default {
       addLoading: false,
       updateLoading: false,
       options: [],
+      classOptions:[{
+        "id":0,
+        "name":"干货"
+      },{
+        "id":1,
+        "name":"生鲜"
+      }],
       typeOptions: [
         {value: "斤" },
+        {value: "两" },
         {value: "袋" },
         {value: "瓶" },
         {value: "桶" },
         {value: "包" },
         {value: "个" },
-        {value: "件" }
+        {value: "件" },
+        {value: "盒" }
       ],
       classId: "",
+      productName:"",
       addFormVisible: false, //新增界面是否显示
       updateFormVisible: false, //新增界面是否显示
       //新增界面数据
@@ -259,6 +295,8 @@ export default {
         price: "",
         remark: "",
         classId: "",
+        sort:"",
+        classType:"",
         type: "",
         imageUrl: ""
       },
@@ -287,7 +325,6 @@ export default {
   created() {
     const date = new Date();
     date.setTime(date.getTime() + 3600 * 1000 * 24);
-    this.startTime = ["2019-09-13", "2019-09-13"];
     this.getUserLabel();
     this.fetchData();
   },
@@ -297,6 +334,9 @@ export default {
 
       if (this.classId) {
         params.classId = this.classId;
+      }
+      if (this.productName) {
+        params.name = this.productName;
       }
       this.listLoading = true;
       getProductList(params).then(response => {
@@ -333,6 +373,8 @@ export default {
           this.updateForm.price = product.price;
           this.updateForm.remark = product.remark;
           this.updateForm.type = product.type;
+          this.updateForm.sort = product.sort;
+          this.updateForm.classType = product.classType;
           this.updateForm.classId = product.classId;
           this.updateForm.imageUrl = product.imageUrl;
         }
