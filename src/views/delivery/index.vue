@@ -81,18 +81,18 @@
     <el-dialog
       title="打印预览"
       :visible.sync="addFormVisible"
-      width="40%"
+      width="36%"
       :close-on-click-modal="false"
     >
       <el-container id="printMe">
-        <el-header>
+        <el-header style="margin-top: 35px;">
           <template>
             <div style="margin-bottom: 10px;">
-              <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div>
+              <!-- <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div> -->
               <div
                 align="center"
                 class="scan-content"
-              >营养参收货单位 {{ school }} 时间 {{this.startTime[0]}}-{{this.startTime[1]}}</div>
+              >营养餐收货单位 {{ school }} 时间 <span v-if="this.startTime[0]==this.startTime[1]">{{this.startTime[0]}}</span> <span v-if="this.startTime[0]!==this.startTime[1]">{{this.startTime[0]}}-{{this.startTime[1]}}</span>        <span style="font-size:30px;margin-left: 20px;">{{schoolId}}</span></div>
             </div>
           </template>
         </el-header>
@@ -101,38 +101,42 @@
           :data="list"
           element-loading-text="Loading"
           border
+          size="mini"
           highlight-current-row
           show-summary
           :summary-method="getSummaries"
           class="print-header"
+          :header-cell-class-name="headerCellClass"
+          :header-row-class-name="headerRowClass"
+          :cell-class-name="cellClass"
+          :row-class-name="rowClass"
         >
-          <el-table-column align="center" label="名称">
+          <el-table-column align="center" class="print-header" label="名称">
             <template slot-scope="scope">{{ scope.row.productName }}</template>
           </el-table-column>
-          <el-table-column label="单位" align="center">
+          <el-table-column label="单位" align="center" width="40">
             <template slot-scope="scope">{{ scope.row.productType }}</template>
           </el-table-column>
-          <el-table-column label="数量" prop="totalCount" align="center">
+          <el-table-column label="数量" prop="totalCount" align="center" width="40">
             <template slot-scope="scope">
               <span>{{ scope.row.totalCount }}</span>
             </template>
           </el-table-column>
-
-          <el-table-column label="单价" prop="price" align="center">
+          <el-table-column label="单价" prop="price" align="center" width="60">
             <template slot-scope="scope">
               <span>{{ scope.row.productPrice }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="送货企业" align="center">
+          <el-table-column label="送货企业" align="center" width="50">
             <span></span>
           </el-table-column>
-          <el-table-column label="生产日期" align="center">
+          <el-table-column label="生产日期" align="center" width="50">
             <span></span>
           </el-table-column>
-          <el-table-column label="保质期" align="center">
+          <el-table-column label="保质期" align="center" width="50">
             <span></span>
           </el-table-column>
-          <el-table-column label="总额" prop="totalPrice" align="center">
+          <el-table-column label="总额" prop="totalPrice" align="center" width="70">
             <template slot-scope="scope">
               <span>{{ scope.row.totalPrice = accMul(scope.row.totalCount, scope.row.productPrice)}}</span>
             </template>
@@ -179,7 +183,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
 .scan-header {
   font-size: 2rem;
   font-weight: bold;
@@ -189,11 +193,40 @@
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 .print-header {
-  margin-top: 10px;
-  font-weight: bold;
+  border: 1px solid black;
   color: black;
+}
+
+.row-class {
+  color: black;
+  border: 1px solid black; 
+}
+.cell-class {
+  border: 1px solid black; 
+}
+
+.cell-class .cell {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding: 0px 0px;
+  
+}
+.el-table__footer-wrapper .has-gutter {
+  border: 1px solid black;
+}
+.el-table__footer-wrapper .is-leaf {
+  background-color: #FFF;
+  color: black;
+}
+.el-dialog__body {
+  padding: 0px 20px;
+}
+
+.el-table--mini td, .el-table--mini th {
+  padding: 0 0;
 }
 </style>
 
@@ -233,6 +266,7 @@ export default {
       }],
       classType:"",
       school: "所有学校",
+      schoolId:"无",
       userId: "",
       products: [],
       addDeliveryForm: {
@@ -287,6 +321,18 @@ export default {
     this.getProductList();
   },
   methods: {
+    rowClass() {
+      return 'row-class';
+    },
+    cellClass() {
+      return 'cell-class';
+    },
+    headerCellClass() {
+      return 'cell-class';
+    },
+    headerRowClass() {
+      return 'row-class';
+    },
     fetchData() {
       const params = {
         startTime: this.startTime[0],
@@ -343,7 +389,7 @@ export default {
           if (index == 2) {
             sums[index] = "";
           } else {
-            sums[index] += " 元";
+            sums[index] += "";
           }
         } else {
           sums[index] = "";
@@ -357,10 +403,12 @@ export default {
         for (let i in this.options) {
           if (index === this.options[i].id) {
             this.school = this.options[i].name;
+            this.schoolId = this.options[i].number;
           }
         }
       } else {
         this.school = "所有学校";
+        this.schoolId = "无";
       }
 
       this.fetchData();
