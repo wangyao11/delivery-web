@@ -16,7 +16,7 @@
       highlight-current-row
     >
       <el-table-column align="center" label="编号" width="95">
-        <template slot-scope="scope">{{ scope.row.id }}</template>
+        <template slot-scope="scope">{{ scope.row.number }}</template>
       </el-table-column>
       <el-table-column label="名称" width="300" align="center">
         <template slot-scope="scope">{{ scope.row.name }}</template>
@@ -29,15 +29,15 @@
       <el-table-column label="地址">
         <template slot-scope="scope">{{ scope.row.address }}</template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.states | statusFilter">{{ scope.row.states==0 ? "启用":"禁用" }}</el-tag>
-        </template>
-      </el-table-column>
       <el-table-column align="center" prop="created_at" label="时间" width="300">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作"  align="center" width="150">
+        <template slot-scope="scope">
+          <el-button @click="handleUpdate(scope.row.id)" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,6 +51,9 @@
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
         <el-form-item label="学校名称" prop="name">
           <el-input v-model="addForm.name" auto-complete="off" placeholder="请输入学校名称"></el-input>
+        </el-form-item>
+        <el-form-item label="学校编号" prop="number">
+          <el-input v-model="addForm.number" auto-complete="off" placeholder="学校编号，用于打印配送单"></el-input>
         </el-form-item>
         <el-form-item label="登录账户" prop="account">
           <el-input v-model="addForm.account" auto-complete="off" placeholder="请输入登录手机号"></el-input>
@@ -70,11 +73,40 @@
         <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="修改学校"
+      :visible.sync="updateFormVisible"
+      width="30%"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="updateForm" label-width="80px" :rules="addFormRules" ref="updateForm">
+        <el-input v-model="updateForm.id" style="display:none"></el-input>
+        <el-form-item label="学校名称" prop="name">
+          <el-input v-model="updateForm.name" auto-complete="off" placeholder="请输入学校名称"></el-input>
+        </el-form-item>
+        <el-form-item label="学校编号" prop="number">
+          <el-input v-model="updateForm.number" auto-complete="off" placeholder="学校编号，用于打印配送单"></el-input>
+        </el-form-item>
+        <el-form-item label="登录账户" prop="account">
+          <el-input v-model="updateForm.account" auto-complete="off" placeholder="请输入登录手机号"></el-input>
+        </el-form-item>
+        <el-form-item label="学校备注">
+          <el-input v-model="updateForm.remark" auto-complete="off" placeholder="请输入学校备注"></el-input>
+        </el-form-item>
+        <el-form-item label="学校地址">
+          <el-input type="textarea" v-model="updateForm.address" placeholder="请输入学校地址"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="updateFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="updateSubmit" :loading="updateLoading">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getList, addUser } from "@/api/table";
+import { getList, addUser, updateUser } from "@/api/table";
 
 export default {
   filters: {
@@ -92,7 +124,9 @@ export default {
       list: null,
       listLoading: true,
       addFormVisible: false, //新增界面是否显示
+      updateFormVisible: false,
       addLoading: false,
+      updateLoading: false,
       //新增界面数据
       addForm: {
         name: "",
@@ -101,10 +135,21 @@ export default {
         remark: "",
         address: ""
       },
+      updateForm: {
+        id: "",
+        name: "",
+        account: "",
+        remark: "",
+        address: "",
+        number:""
+      },
       addFormRules: {
         name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
           { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" }
+        ],
+        number: [
+          { required: true, message: "请输入编号", trigger: "blur" }
         ],
         account: [
           { required: true, message: "请输入手机号码", trigger: "blur" },
@@ -160,6 +205,48 @@ export default {
               this.addLoading = false;
             });
           });
+        }
+      });
+    },
+    //显示编辑界面
+    handleUpdate: function(id) {
+      console.log("id:" + id);
+      this.updateForm.id = id;
+      this.updateFormVisible = true;
+      if (this.$refs["updateForm"]) {
+        this.$refs["updateForm"].resetFields();
+      }
+      for (var i in this.list) {
+        var user = this.list[i];
+        if (user.id === id) {
+          this.updateForm.name = user.name;
+          this.updateForm.account = user.account;
+          this.updateForm.remark = user.remark;
+          this.updateForm.address = user.address;
+          this.updateForm.number = user.number;
+        }
+      }
+    },
+    //修改
+    updateSubmit: function() {
+      this.$refs.updateForm.validate(valid => {
+        if (valid) {
+          this.updateLoading = true;
+          let params = Object.assign({}, this.updateForm);
+          updateUser(params).then(
+            res => {
+              this.updateLoading = false;
+              this.$message({
+                message: "修改成功",
+                type: "success"
+              });
+              this.updateFormVisible = false;
+              this.fetchData();
+            },
+            error => {
+              this.updateLoading = false;
+            }
+          );
         }
       });
     }

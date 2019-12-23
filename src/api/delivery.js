@@ -30,3 +30,27 @@ export function deleteById(id) {
     method: 'post'
   })
 }
+
+export function listDayTotalByUserIdAndDate(params) {
+  return request({
+    url: '/web/data/listDayTotalByUserIdAndDate',
+    method: 'post',
+    data:params
+  })
+}
+
+export function saveDelivery(params) {
+  return request({
+    url: '/web/deliveryUserProduct/saveDelivery',
+    method: 'post',
+    data:params
+  })
+}
+
+export function isSaveDelivery(params) {
+  return request({
+    url: '/web/deliveryUserProduct/isSaveDelivery',
+    method: 'post',
+    data:params
+  })
+}

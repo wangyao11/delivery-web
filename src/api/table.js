@@ -17,3 +17,11 @@ export function addUser(params) {
   })
 }
 
+export function updateUser(params) {
+  return request({
+    url: 'web/user/updateById',
+    method: 'post',
+    data: params
+  })
+}
+
