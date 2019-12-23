@@ -303,6 +303,9 @@ export default {
               return Number(prev.toFixed(2))
             }
           }, 0);
+          if(index === 3) {
+            sums[3] = sums[3]/100;
+          }
         }
       });
 
