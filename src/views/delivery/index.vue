@@ -146,7 +146,7 @@
       </el-container>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
-        <el-button type="primary" v-print="'#printMe'">打印</el-button>
+        <el-button type="primary" @click="saveDeliveyEvent(this)" :loading="saveLoading" v-print="'#printMe'">打印</el-button>
         <el-button type="primary" @click="saveDeliveyEvent(this)" :loading="saveLoading">{{isSaveDeliveryStr}}</el-button>
       </div>
     </el-dialog>

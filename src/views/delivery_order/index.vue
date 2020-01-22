@@ -17,17 +17,21 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-select v-model="userId" clearable placeholder="请选择学校" @change="fetchData">
+          <el-select v-model="userId" clearable placeholder="请选择学校" @change="selectUser">
             <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-select v-model="classType" clearable placeholder="请选择类别" @change="fetchData">
+          <el-select v-model="classType" clearable placeholder="请选择类别" @change="selectUser">
             <el-option v-for="item in classOptions" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @change="fetchData">刷新</el-button>
+          <el-button type="primary" @change="selectUser">刷新</el-button>
+        </el-form-item>
+        <el-form-item>
+          <!-- <el-button type="primary" v-print="'#printMe'">打印</el-button> -->
+          <el-button type="primary" @click.native="printVisible = true">打印</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -67,36 +71,76 @@
         </template>
       </el-table-column> -->
     </el-table>
+
     <el-dialog
-      title="手动编辑商品"
-      :visible.sync="addDeliveryVisible"
-      width="30%"
+      title="打印预览"
+      :visible.sync="printVisible"
+      width="36%"
       :close-on-click-modal="false"
     >
-      <el-form :model="addDeliveryForm" label-width="80px" ref="addDeliveryForm">
-        <el-form-item label="配送日期">
-          <el-input v-model="school" auto-complete="off" disabled="disabled"></el-input>
-        </el-form-item>
-        <el-form-item label="配送日期">
-          <el-input v-model="startTime[0]" auto-complete="off" disabled="disabled"></el-input>
-        </el-form-item>
-        <el-form-item label="商品">
-          <el-select v-model="addDeliveryForm.productId" filterable placeholder="请选择商品">
-            <el-option v-for="item in products" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="数量">
-          <el-input
-            v-model="addDeliveryForm.count"
-            auto-complete="off"
-            placeholder="请输入商品数量"
-            type="number"
-          ></el-input>
-        </el-form-item>
-      </el-form>
+      <el-container id="printMe">
+        <el-header style="margin-top: 35px;">
+          <template>
+            <div style="margin-bottom: 10px;">
+              <!-- <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div> -->
+              <div
+                align="center"
+                class="scan-content"
+              >营养餐收货单位 {{ school }} 时间 <span v-if="this.startTime[0]==this.startTime[1]">{{this.startTime[0]}}</span> <span v-if="this.startTime[0]!==this.startTime[1]">{{this.startTime[0]}}-{{this.startTime[1]}}</span>        <span style="font-size:30px;margin-left: 20px;">{{schoolId}}</span></div>
+            </div>
+          </template>
+        </el-header>
+        <el-table
+          v-loading="listLoading"
+          :data="list"
+          v-model="deliveryLists"
+          element-loading-text="Loading"
+          border
+          size="mini"
+          highlight-current-row
+          show-summary
+          :summary-method="getSummaries"
+          class="print-header"
+          :header-cell-class-name="headerCellClass"
+          :header-row-class-name="headerRowClass"
+          :cell-class-name="cellClass"
+          :row-class-name="rowClass"
+        >
+          <el-table-column align="center" class="print-header" label="名称">
+            <template slot-scope="scope">{{ scope.row.productName }}</template>
+          </el-table-column>
+          <el-table-column label="单位" align="center" width="40">
+            <template slot-scope="scope">{{ scope.row.productType }}</template>
+          </el-table-column>
+          <el-table-column label="数量" prop="totalCount" align="center" width="40">
+            <template slot-scope="scope">
+              <span style="font-weight: 800;font-size: 15px;">{{ scope.row.totalCount }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="单价" prop="price" align="center" width="60">
+            <template slot-scope="scope">
+              <span>{{ (scope.row.totalPrice / scope.row.totalCount) / 100 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="送货企业" align="center" width="50">
+            <span></span>
+          </el-table-column>
+          <el-table-column label="生产日期" align="center" width="50">
+            <span></span>
+          </el-table-column>
+          <el-table-column label="保质期" align="center" width="50">
+            <span></span>
+          </el-table-column>
+          <el-table-column label="总额" prop="totalPrice" align="center" width="70">
+            <template slot-scope="scope">
+              <span>{{scope.row.totalPrice / 100}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-container>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="addDeliveryVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+        <el-button @click.native="printVisible = false">取消</el-button>
+        <el-button type="primary" v-print="'#printMe'">打印</el-button>
       </div>
     </el-dialog>
   </div>
@@ -174,7 +218,7 @@ export default {
       listLoading: true,
       addLoading: false,
       addFormVisible: false, //打印配送单
-      addDeliveryVisible: false, //新增界面是否显示
+      printVisible: false, //新增界面是否显示
       options: [],
       classOptions:[{
         'id':'0',
@@ -188,12 +232,6 @@ export default {
       schoolId:"无",
       userId: "",
       products: [],
-      addDeliveryForm: {
-        count: 0,
-        productId: "",
-        dateTime: "",
-        userId: ""
-      },
       pickerOptions: {
         shortcuts: [
           {
@@ -271,6 +309,21 @@ export default {
           this.listLoading = false;
         });
     },
+    selectUser(index) {
+      if (index) {
+        for (let i in this.options) {
+          if (index === this.options[i].id) {
+            this.school = this.options[i].name;
+            this.schoolId = this.options[i].number;
+          }
+        }
+      } else {
+        this.school = "所有学校";
+        this.schoolId = "无";
+      }
+
+      this.fetchData();
+    },
     getProductList() {
       getProductList({}).then(response => {
         this.products = response.value;
@@ -306,140 +359,13 @@ export default {
           if(index === 3) {
             sums[3] = sums[3]/100;
           }
+          if(index === 7) {
+            sums[7] = sums[7]/100;
+          }
         }
       });
 
       return sums;
-    },
-    showAddProduct() {
-      if (this.startTime === "") {
-        this.$message({
-          message: "日期不能为空",
-          type: "error"
-        });
-        return;
-      }
-      if (this.startTime[0] !== this.startTime[1]) {
-        this.$message({
-          message: "必须选择同一天",
-          type: "error"
-        });
-        return;
-      }
-
-      if (this.userId === "") {
-        this.$message({
-          message: "学校不能为空",
-          type: "error"
-        });
-        return;
-      }
-      this.addDeliveryForm = {
-        count: 0,
-        productId: ""
-      }
-      this.addDeliveryVisible = true;
-    },
-    addSubmit() {
-      this.$confirm("确认添加商品吗？", "提示", {}).then(() => {
-        this.addLoading = true;
-        let params = Object.assign({}, this.addDeliveryForm);
-        params.dateTime = this.startTime[0];
-        params.userId = this.userId;
-        addProductDelivery(params).then(
-          res => {
-            this.addLoading = false;
-            this.$message({
-              message: "添加成功",
-              type: "success"
-            });
-            this.addDeliveryVisible = false;
-            this.fetchData();
-          },
-          error => {
-            this.addLoading = false;
-          }
-        );
-      });
-    },
-    deleteById(deliveryId) {
-      if (this.startTime === "") {
-        this.$message({
-          message: "日期不能为空",
-          type: "error"
-        });
-        return;
-      }
-      if (this.startTime[0] !== this.startTime[1]) {
-        this.$message({
-          message: "必须选择同一天",
-          type: "error"
-        });
-        return;
-      }
-
-      if (this.userId === "") {
-        this.$message({
-          message: "请选择学校",
-          type: "error"
-        });
-        return;
-      }
-      this.$confirm("确认删除配送单中的商品吗？", "提示", {}).then(() => {
-        this.addLoading = true;
-        apiDeleteById(deliveryId).then(
-          res => {
-            this.addLoading = false;
-            this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.fetchData();
-          },
-          error => {
-            this.$message({
-              message: "删除失败！",
-              type: "error"
-            });
-          }
-        );
-      });
-    },
-    showUpdateProduct(delivery){
-      if (this.startTime === "") {
-        this.$message({
-          message: "日期不能为空",
-          type: "error"
-        });
-        return;
-      }
-      if (this.startTime[0] !== this.startTime[1]) {
-        this.$message({
-          message: "必须选择同一天",
-          type: "error"
-        });
-        return;
-      }
-
-      if (this.userId === "") {
-        this.$message({
-          message: "学校不能为空",
-          type: "error"
-        });
-        return;
-      }
-      this.addDeliveryForm = {
-        count: delivery.totalCount,
-        productId: delivery.productId
-      }
-      this.addDeliveryVisible = true;
-    },
-    accMul(arg1,arg2)
-    {
-      var m=0,s1=arg1.toString(),s2=arg2.toString();
-      try{m+=s1.split(".")[1].length}catch(e){}
-      try{m+=s2.split(".")[1].length}catch(e){}
-      return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
     }
   }
 };
