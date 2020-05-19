@@ -147,7 +147,7 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
         <el-button type="primary" @click="saveDeliveyEvent(this)" :loading="saveLoading" v-print="'#printMe'">打印</el-button>
-        <el-button type="primary" @click="saveDeliveyEvent(this)" :loading="saveLoading">{{isSaveDeliveryStr}}</el-button>
+        <!-- <el-button type="primary" @click="saveDeliveyEvent(this)" :loading="saveLoading">{{isSaveDeliveryStr}}</el-button> -->
       </div>
     </el-dialog>
     <el-dialog
@@ -588,6 +588,7 @@ export default {
       let params = {};
       params.dateTime = this.startTime[0];
       params.userId = this.userId;
+      params.classType = this.classType
       params.values = arrayList;
       saveDelivery(params).then(
         res => {
