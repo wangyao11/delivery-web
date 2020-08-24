@@ -81,11 +81,11 @@
     <el-dialog
       title="打印预览"
       :visible.sync="addFormVisible"
-      width="36%"
+      width="27%"
       :close-on-click-modal="false"
     >
       <el-container id="printMe">
-        <el-header style="margin-top: 35px;">
+        <el-header style="margin-top: 30px;">
           <template>
             <div style="margin-bottom: 10px;">
               <!-- <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div> -->
@@ -214,6 +214,7 @@
   padding-left: 0px;
   padding-right: 0px;
   padding: 0px 0px;
+  line-height: 15px;
   
 }
 .el-table__footer-wrapper .has-gutter {
@@ -436,7 +437,7 @@ export default {
         return;
       }
 
-      if (this.userId === "") {
+      if (!this.userId || this.userId === "" ) {
         this.$message({
           message: "学校不能为空",
           type: "error"
@@ -487,7 +488,7 @@ export default {
         return;
       }
 
-      if (this.userId === "") {
+      if (!this.userId || this.userId === "" ) {
         this.$message({
           message: "请选择学校",
           type: "error"
@@ -530,7 +531,7 @@ export default {
         return;
       }
 
-      if (this.userId === "") {
+      if (!this.userId || this.userId === "" ) {
         this.$message({
           message: "学校不能为空",
           type: "error"
@@ -559,7 +560,7 @@ export default {
         return;
       }
 
-      if (this.userId === "") {
+      if (!this.userId || this.userId === "" ) {
         this.$message({
           message: "学校不能为空",
           type: "error"
@@ -610,7 +611,8 @@ export default {
       if (this.startTime[0] !== this.startTime[1]) {
         return;
       }
-      if (this.userId === "") {
+      console.log(this.userId)
+      if (!this.userId || this.userId === "" ) {
         return;
       }
       var params = {
