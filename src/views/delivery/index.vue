@@ -85,7 +85,7 @@
       :close-on-click-modal="false"
     >
       <el-container id="printMe">
-        <el-header style="margin-top: 30px;">
+        <el-header style="margin-top: 10px;">
           <template>
             <div style="margin-bottom: 10px;">
               <!-- <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div> -->
@@ -214,7 +214,7 @@
   padding-left: 0px;
   padding-right: 0px;
   padding: 0px 0px;
-  line-height: 15px;
+  line-height: 18px;
   
 }
 .el-table__footer-wrapper .has-gutter {
