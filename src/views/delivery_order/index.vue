@@ -119,7 +119,7 @@
           </el-table-column>
           <el-table-column label="单价" prop="price" align="center" width="60">
             <template slot-scope="scope">
-              <span>{{ (scope.row.totalPrice / scope.row.totalCount) / 100 }}</span>
+              <span>{{ ((scope.row.totalPrice / scope.row.totalCount) / 100).toFixed(2) }}</span>
             </template>
           </el-table-column>
           <el-table-column label="送货企业" align="center" width="50">
