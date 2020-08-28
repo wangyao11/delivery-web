@@ -274,7 +274,8 @@ export default {
         {value: "包" },
         {value: "个" },
         {value: "件" },
-        {value: "盒" }
+        {value: "盒" },
+        {value: "盘" }
       ],
       classId: "",
       productName:"",
