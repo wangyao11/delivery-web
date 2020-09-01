@@ -86,7 +86,7 @@
               <div
                 align="center"
                 class="scan-content"
-              >营养餐收货单位 {{ school }} 时间 <span v-if="this.startTime[0]==this.startTime[1]">{{this.startTime[0]}}</span> <span v-if="this.startTime[0]!==this.startTime[1]">{{this.startTime[0]}}-{{this.startTime[1]}}</span>        <span style="font-size:30px;margin-left: 20px;">{{schoolId}}</span></div>
+              >收货单位 {{ school }} 时间 <span v-if="this.startTime[0]==this.startTime[1]">{{this.startTime[0]}}</span> <span v-if="this.startTime[0]!==this.startTime[1]">{{this.startTime[0]}}-{{this.startTime[1]}}</span>        <span style="font-size:30px;margin-left: 20px;">{{schoolId}}</span></div>
             </div>
           </template>
         </el-header>
