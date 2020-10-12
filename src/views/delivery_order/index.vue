@@ -75,11 +75,11 @@
     <el-dialog
       title="打印预览"
       :visible.sync="printVisible"
-      width="27%"
+      width="30%"
       :close-on-click-modal="false"
     >
       <el-container id="printMe">
-        <el-header style="margin-top: 10px;">
+        <el-header style="height:50px">
           <template>
             <div style="margin-bottom: 10px;">
               <!-- <div align="center" class="scan-header">宝鸡耀锋兄弟商贸有限公司送货清单</div> -->
@@ -112,7 +112,7 @@
           <el-table-column label="单位" align="center" width="40">
             <template slot-scope="scope">{{ scope.row.productType }}</template>
           </el-table-column>
-          <el-table-column label="数量" prop="totalCount" align="center" width="40">
+          <el-table-column label="数量" prop="totalCount" align="center" width="50">
             <template slot-scope="scope">
               <span style="font-weight: 800;font-size: 15px;">{{ scope.row.totalCount }}</span>
             </template>
@@ -122,16 +122,13 @@
               <span>{{ ((scope.row.totalPrice / scope.row.totalCount) / 100).toFixed(2) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="送货企业" align="center" width="50">
-            <span></span>
-          </el-table-column>
-          <el-table-column label="生产日期" align="center" width="50">
+          <el-table-column label="生产日期" align="center" width="65">
             <span></span>
           </el-table-column>
           <el-table-column label="保质期" align="center" width="50">
             <span></span>
           </el-table-column>
-          <el-table-column label="总额" prop="totalPrice" align="center" width="70">
+          <el-table-column label="总额" prop="totalPrice" align="center" width="100">
             <template slot-scope="scope">
               <span>{{scope.row.totalPrice / 100}}</span>
             </template>
@@ -168,14 +165,15 @@
   border: 1px solid black; 
 }
 .cell-class {
-  border: 1px solid black; 
+  border: 1px solid black;
+  font-size: 15px;
 }
 
 .cell-class .cell {
   padding-left: 0px;
   padding-right: 0px;
-  padding: 0px 0px;
-  line-height: 18px;
+  padding: 3px 0px;
+  line-height: 14px;
   
 }
 .el-table__footer-wrapper .has-gutter {
@@ -184,6 +182,7 @@
 .el-table__footer-wrapper .is-leaf {
   background-color: #FFF;
   color: black;
+  font-size: 15px;
 }
 .el-dialog__body {
   padding: 0px 20px;
@@ -303,7 +302,24 @@ export default {
       this.listLoading = true;
       listDayTotalByUserIdAndDate(params)
         .then(response => {
-          this.list = response.value;
+          var oneArr = response.value.filter(item => item.classType === 0)
+          var twoArr = response.value.filter(item => item.classType === 1)
+
+          oneArr.sort(function(a, b){
+            var x = a.productName.toLowerCase();
+            var y = b.productName.toLowerCase();
+            if (x < y) {return -1;}
+            if (x > y) {return 1;}
+            return 0;
+          });
+          twoArr.sort(function(a, b){
+            var x = a.productName.toLowerCase();
+            var y = b.productName.toLowerCase();
+            if (x < y) {return -1;}
+            if (x > y) {return 1;}
+            return 0;
+          });
+          this.list = oneArr.concat(twoArr);
           this.listLoading = false;
         })
         .catch(() => {
@@ -360,8 +376,8 @@ export default {
           if(index === 3) {
             sums[3] = sums[3]/100;
           }
-          if(index === 7) {
-            sums[7] = sums[7]/100;
+          if(index === 6) {
+            sums[6] = sums[6]/100;
           }
         }
       });
