@@ -111,8 +111,11 @@
           :header-row-class-name="headerRowClass"
           :cell-class-name="cellClass"
           :row-class-name="rowClass"
-        >
-          <el-table-column align="center" class="print-header" label="名称">
+        > 
+          <el-table-column align="center" class="print-header" label="序号" width="45">
+            <template slot-scope="scope">{{ scope.$index + 1 }}</template>
+          </el-table-column>
+          <el-table-column align="center"  label="名称">
             <template slot-scope="scope">{{ scope.row.productName }}</template>
           </el-table-column>
           <el-table-column label="单位" align="center" width="40">
@@ -214,6 +217,12 @@
   padding: 3px 0px;
   line-height: 14px;
   
+}
+.el-table__footer .cell {
+  padding:0;
+}
+.el-table__body-wrapper {
+  border-bottom: 1px solid black;
 }
 .el-table__footer-wrapper .has-gutter {
   border: 1px solid black;
