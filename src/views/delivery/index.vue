@@ -593,13 +593,13 @@ export default {
         return;
       }
 
-      if(this.list.length == 0) {
-        this.$message({
-          message: "暂无数据可保存",
-          type: "error"
-        });
-        return;
-      }
+      // if(this.list.length == 0) {
+      //   this.$message({
+      //     message: "暂无数据可保存",
+      //     type: "error"
+      //   });
+      //   return;
+      // }
 
       var arrayList = [];
       this.list.forEach(item=>{  
