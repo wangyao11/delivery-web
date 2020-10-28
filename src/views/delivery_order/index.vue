@@ -99,7 +99,7 @@
           size="mini"
           highlight-current-row
           show-summary
-          :summary-method="getSummaries"
+          :summary-method="getPrintSummaries"
           class="print-header"
           :header-cell-class-name="headerCellClass"
           :header-row-class-name="headerRowClass"
@@ -385,15 +385,37 @@ export default {
           if(index === 3) {
             sums[3] = sums[3]/100;
           }
-          if(index === 6) {
-            sums[6] = sums[6]/100;
-          }
         }
       });
 
       return sums;
+    },
+    getPrintSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = "总价";
+          return;
+        }
+        const values = data.map(item => Number(item[column.property]));
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return Number((prev + curr).toFixed(2));
+            } else {
+              return Number(prev.toFixed(2))
+            }
+          }, 0);
+          if(index === 7) {
+            sums[7] = sums[7]/100;
+          }
+        }
+      });
+      return sums;
     }
-  }
+  },
 };
 </script>
 
