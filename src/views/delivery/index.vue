@@ -132,10 +132,10 @@
             </template>
           </el-table-column>
           <el-table-column label="生产日期" align="center" width="65">
-            <span></span>
+            <div contenteditable="true"></div>
           </el-table-column>
           <el-table-column label="保质期" align="center" width="50">
-            <span></span>
+            <div contenteditable="true"></div>
           </el-table-column>
           <el-table-column label="总额" prop="totalPrice" align="center" width="100">
             <template slot-scope="scope">
