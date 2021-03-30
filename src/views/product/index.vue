@@ -122,6 +122,12 @@
         <el-form-item label="商品描述">
           <el-input v-model="addForm.remark" auto-complete="off" placeholder="请输入分类描述"></el-input>
         </el-form-item>
+        <el-form-item label="生产日期">
+          <el-input v-model="addForm.manufactureDate" auto-complete="off" placeholder="请输入生产日期"></el-input>
+        </el-form-item>
+        <el-form-item label="保质期">
+          <el-input v-model="addForm.guaranteeDate" auto-complete="off" placeholder="请输入保质期"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
@@ -188,6 +194,12 @@
         </el-form-item>
         <el-form-item label="商品描述">
           <el-input v-model="updateForm.remark" auto-complete="off" placeholder="请输入分类描述"></el-input>
+        </el-form-item>
+        <el-form-item label="生产日期">
+          <el-input v-model="updateForm.manufactureDate" auto-complete="off" placeholder="请输入生产日期"></el-input>
+        </el-form-item>
+        <el-form-item label="保质期">
+          <el-input v-model="updateForm.guaranteeDate" auto-complete="off" placeholder="请输入保质期"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -288,7 +300,9 @@ export default {
         remark: "",
         classId: "",
         type: "",
-        imageUrl: ""
+        imageUrl: "",
+        manufactureDate:"",
+        guaranteeDate:""
       },
       updateForm: {
         id: "",
@@ -299,7 +313,9 @@ export default {
         sort:"",
         classType:"",
         type: "",
-        imageUrl: ""
+        imageUrl: "",
+        manufactureDate:"",
+        guaranteeDate:""
       },
       addFormRules: {
         name: [
@@ -378,6 +394,8 @@ export default {
           this.updateForm.classType = product.classType;
           this.updateForm.classId = product.classId;
           this.updateForm.imageUrl = product.imageUrl;
+          this.updateForm.manufactureDate = product.manufactureDate;
+          this.updateForm.guaranteeDate = product.guaranteeDate;
         }
       }
       console.log(this.updateForm);

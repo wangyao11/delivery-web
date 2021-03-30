@@ -126,10 +126,14 @@
             </template>
           </el-table-column>
           <el-table-column label="生产日期" align="center" width="65">
-            <div contenteditable="true"></div>
+            <template slot-scope="scope">
+              <div contenteditable="true">{{ parseDate(scope.row.manufactureDate)}}</div>
+            </template>
           </el-table-column>
           <el-table-column label="保质期" align="center" width="50">
-            <div contenteditable="true"></div>
+            <template slot-scope="scope">
+              <div contenteditable="true">{{ parseGuarantee(scope.row.guaranteeDate)}}</div>
+            </template>
           </el-table-column>
           <el-table-column label="总额" prop="totalPrice" align="center" width="100">
             <template slot-scope="scope">
@@ -296,6 +300,18 @@ export default {
     },
     headerRowClass() {
       return 'row-class';
+    },
+    parseDate(arg)
+    {
+      if(arg != "") return arg;
+      const date = new Date();
+      date.setTime(date.getTime() + 3600 * 1000 * 24);
+      return moment(date).format("YYYY/MM/DD");
+    },
+    parseGuarantee(arg)
+    {
+      if(arg != "") return arg;
+      return "一天";
     },
     fetchData() {
       const params = {
