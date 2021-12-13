@@ -585,7 +585,7 @@ export default {
       if(arg != "") return arg;
       const date = new Date();
       date.setTime(date.getTime() + 3600 * 1000 * 24);
-      return moment(date).format("YYYY/MM/DD");
+      return moment(date).format("YY-MM-DD");
     },
     parseGuarantee(arg)
     {
